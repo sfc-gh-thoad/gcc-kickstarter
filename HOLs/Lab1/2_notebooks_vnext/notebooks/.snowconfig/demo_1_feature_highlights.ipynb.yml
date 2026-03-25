@@ -1,0 +1,5 @@
+location:
+  database: TH_DEMO_DB
+  schema: PUBLIC
+  name: NOTEBOOKS_WORKSPACES_DEMO_REPO_PROJ_63BC4175
+role: ACCOUNTADMIN
