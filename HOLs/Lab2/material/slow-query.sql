@@ -8,12 +8,12 @@ WITH RECURSIVE date_spine AS (
 ),
 exploded_sales AS (
     SELECT s.*, d.n AS dummy_row
-    FROM GSK_GCC_HOL.HOL_2.SALES_DATA s
+    FROM HOL_2_WORK.HOL_2.SALES_DATA s
     CROSS JOIN date_spine d
 ),
 exploded_compounds AS (
     SELECT c.*, d.n AS dummy_row
-    FROM GSK_GCC_HOL.HOL_2.COMPOUNDS c
+    FROM HOL_2_WORK.HOL_2.COMPOUNDS c
     CROSS JOIN date_spine d
     WHERE d.n <= 5
 ),
@@ -25,8 +25,8 @@ ae_verbose AS (
         ae2.EVENT_TYPE AS related_event_type,
         ae2.OUTCOME AS related_outcome,
         CASE WHEN ae1.SEVERITY = ae2.SEVERITY THEN 1 ELSE 0 END AS severity_match
-    FROM GSK_GCC_HOL.HOL_2.ADVERSE_EVENTS ae1
-    CROSS JOIN GSK_GCC_HOL.HOL_2.ADVERSE_EVENTS ae2
+    FROM HOL_2_WORK.HOL_2.ADVERSE_EVENTS ae1
+    CROSS JOIN HOL_2_WORK.HOL_2.ADVERSE_EVENTS ae2
     CROSS JOIN date_spine d
 ),
 ae_stats AS (
@@ -74,10 +74,10 @@ massive_join AS (
         es.CHANNEL,
         es.REVENUE_USD,
         es.UNITS_SOLD,
-        (SELECT AVG(REVENUE_USD) FROM GSK_GCC_HOL.HOL_2.SALES_DATA) AS global_avg_revenue,
-        (SELECT COUNT(*) FROM GSK_GCC_HOL.HOL_2.ADVERSE_EVENTS WHERE SEVERITY = 'Severe') AS total_severe_events,
-        (SELECT MAX(MOLECULAR_WEIGHT) FROM GSK_GCC_HOL.HOL_2.COMPOUNDS) AS max_mol_weight,
-        (SELECT COUNT(DISTINCT TRIAL_PHASE) FROM GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS) AS distinct_phases,
+        (SELECT AVG(REVENUE_USD) FROM HOL_2_WORK.HOL_2.SALES_DATA) AS global_avg_revenue,
+        (SELECT COUNT(*) FROM HOL_2_WORK.HOL_2.ADVERSE_EVENTS WHERE SEVERITY = 'Severe') AS total_severe_events,
+        (SELECT MAX(MOLECULAR_WEIGHT) FROM HOL_2_WORK.HOL_2.COMPOUNDS) AS max_mol_weight,
+        (SELECT COUNT(DISTINCT TRIAL_PHASE) FROM HOL_2_WORK.HOL_2.CLINICAL_TRIALS) AS distinct_phases,
         ct.TRIAL_PHASE,
         ct.STATUS AS trial_status,
         ct.ENROLLED_PATIENTS,
@@ -95,7 +95,7 @@ massive_join AS (
         LENGTH(ec.COMPOUND_NAME) * ec.MOLECULAR_WEIGHT AS pointless_calc
     FROM exploded_sales es
     CROSS JOIN exploded_compounds ec
-    LEFT JOIN GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS ct
+    LEFT JOIN HOL_2_WORK.HOL_2.CLINICAL_TRIALS ct
         ON ct.COMPOUND_ID = ec.COMPOUND_ID
     LEFT JOIN ae_stats ON ae_stats.TRIAL_ID = ct.TRIAL_ID
     LEFT JOIN pd_stats ON pd_stats.TRIAL_ID = ct.TRIAL_ID

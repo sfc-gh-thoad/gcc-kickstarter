@@ -7,7 +7,7 @@ WITH trial_pool AS (
     SELECT trial_id, start_date,
         COALESCE(end_date, '2025-12-31'::DATE) AS eff_end,
         DATEDIFF('day', start_date, COALESCE(end_date, '2025-12-31'::DATE)) AS day_range
-    FROM GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS
+    FROM HOL_2_WORK.HOL_2.CLINICAL_TRIALS
 ),
 generated AS (
     SELECT

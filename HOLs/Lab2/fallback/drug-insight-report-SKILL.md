@@ -10,7 +10,7 @@ Generate a comprehensive executive summary for a pharmaceutical compound using l
 
 ## Workflow
 
-1. Look up the compound in `GSK_GCC_HOL.HOL_2.COMPOUNDS` by name
+1. Look up the compound in `HOL_2_WORK.HOL_2.COMPOUNDS` by name
 2. Pull all clinical trials for that compound from `CLINICAL_TRIALS`
 3. Pull all adverse events from `ADVERSE_EVENTS` for those trials
 4. Build a data summary with:
@@ -29,17 +29,17 @@ Generate a comprehensive executive summary for a pharmaceutical compound using l
 USE WAREHOUSE COMPUTE_WH;
 
 WITH compound_info AS (
-    SELECT * FROM GSK_GCC_HOL.HOL_2.COMPOUNDS
+    SELECT * FROM HOL_2_WORK.HOL_2.COMPOUNDS
     WHERE LOWER(compound_name) = LOWER('<COMPOUND_NAME>')
 ),
 trial_info AS (
     SELECT t.*
-    FROM GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS t
+    FROM HOL_2_WORK.HOL_2.CLINICAL_TRIALS t
     JOIN compound_info c ON t.compound_id = c.compound_id
 ),
 ae_info AS (
     SELECT a.*
-    FROM GSK_GCC_HOL.HOL_2.ADVERSE_EVENTS a
+    FROM HOL_2_WORK.HOL_2.ADVERSE_EVENTS a
     JOIN trial_info t ON a.trial_id = t.trial_id
 ),
 data_summary AS (

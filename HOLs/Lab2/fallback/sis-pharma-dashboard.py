@@ -41,10 +41,10 @@ st.markdown('<div style="font-size:2.5rem;font-weight:700;color:#F36F21;letter-s
 st.title("GSK Pharma Pipeline Dashboard")
 
 try:
-    compounds = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS").to_pandas()
-    trials = session.table("GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS").to_pandas()
-    adverse = session.table("GSK_GCC_HOL.HOL_2.ADVERSE_EVENTS").to_pandas()
-    sales = session.table("GSK_GCC_HOL.HOL_2.SALES_DATA").to_pandas()
+    compounds = session.table("HOL_2_WORK.HOL_2.COMPOUNDS").to_pandas()
+    trials = session.table("HOL_2_WORK.HOL_2.CLINICAL_TRIALS").to_pandas()
+    adverse = session.table("HOL_2_WORK.HOL_2.ADVERSE_EVENTS").to_pandas()
+    sales = session.table("HOL_2_WORK.HOL_2.SALES_DATA").to_pandas()
 except Exception as e:
     st.error(f"Failed to load data: {e}")
     st.stop()

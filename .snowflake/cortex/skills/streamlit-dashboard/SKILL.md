@@ -45,18 +45,18 @@ You MUST call `.to_pandas()` before passing data to ANY Streamlit display functi
 
 ```python
 # CORRECT — converts to pandas first
-df = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS").to_pandas()
+df = session.table("HOL_2_WORK.HOL_2.COMPOUNDS").to_pandas()
 st.dataframe(df)
 st.bar_chart(df, x="PHASE", y="COMPOUND_ID")
 
 # WRONG — Snowpark DataFrame cannot be rendered by Streamlit
-df = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS")
+df = session.table("HOL_2_WORK.HOL_2.COMPOUNDS")
 st.dataframe(df)  # ERROR
 ```
 
 For SQL queries:
 ```python
-df = session.sql("SELECT PHASE, COUNT(*) AS CNT FROM GSK_GCC_HOL.HOL_2.COMPOUNDS GROUP BY PHASE").to_pandas()
+df = session.sql("SELECT PHASE, COUNT(*) AS CNT FROM HOL_2_WORK.HOL_2.COMPOUNDS GROUP BY PHASE").to_pandas()
 ```
 
 ALWAYS fully qualify table names: `DATABASE.SCHEMA.TABLE`
@@ -290,7 +290,7 @@ from snowflake.snowpark.context import get_active_session
 
 session = get_active_session()
 st.set_page_config(layout="wide")
-df = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS").to_pandas()
+df = session.table("HOL_2_WORK.HOL_2.COMPOUNDS").to_pandas()
 st.dataframe(df)
 
 # WRONG — will not work correctly in Streamlit
@@ -338,7 +338,7 @@ Wrap data loading in try/except so the app shows a helpful message instead of a 
 ```python
 try:
     session = get_active_session()
-    compounds = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS").to_pandas()
+    compounds = session.table("HOL_2_WORK.HOL_2.COMPOUNDS").to_pandas()
 except Exception as e:
     st.error(f"Failed to load data: {e}")
     st.stop()
@@ -535,8 +535,8 @@ st.markdown('<div style="font-size:2.5rem;font-weight:700;color:#F36F21;letter-s
 st.title("Dashboard Title")
 
 try:
-    compounds = session.table("GSK_GCC_HOL.HOL_2.COMPOUNDS").to_pandas()
-    trials = session.table("GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS").to_pandas()
+    compounds = session.table("HOL_2_WORK.HOL_2.COMPOUNDS").to_pandas()
+    trials = session.table("HOL_2_WORK.HOL_2.CLINICAL_TRIALS").to_pandas()
 except Exception as e:
     st.error(f"Failed to load data: {e}")
     st.stop()
