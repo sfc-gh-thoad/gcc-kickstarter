@@ -48,8 +48,8 @@ pd_bloated AS (
         pd2.BMI AS other_bmi,
         pd2.SEX AS other_sex,
         ABS(pd1.AGE - pd2.AGE) AS age_diff
-    FROM GSK_GCC_HOL.HOL_2.PATIENT_DEMOGRAPHICS pd1
-    CROSS JOIN GSK_GCC_HOL.HOL_2.PATIENT_DEMOGRAPHICS pd2
+    FROM HOL_2_WORK.HOL_2.PATIENT_DEMOGRAPHICS pd1
+    CROSS JOIN HOL_2_WORK.HOL_2.PATIENT_DEMOGRAPHICS pd2
     CROSS JOIN date_spine d
 ),
 pd_stats AS (

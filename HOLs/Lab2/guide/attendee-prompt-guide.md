@@ -2,6 +2,17 @@
 
 All prompts for the presenter to use during the hands-on lab. Copy-paste ready.
 
+> **Two-database setup:** `GSK_GCC_HOL` is the shared read-only source data. `HOL_2_WORK` is your local writable database for anything you create.
+
+---
+
+## Act 0: Setup (2 min)
+
+**Prompt — Create your working database:**
+```
+Create a database called HOL_2_WORK with a schema called HOL_2, and set the context to use it with COMPUTE_WH.
+```
+
 ---
 
 ## Act 1: UI Orientation (5 min)
@@ -10,9 +21,6 @@ All prompts for the presenter to use during the hands-on lab. Copy-paste ready.
 ```
 What tables exist in GSK_GCC_HOL.HOL_2?
 ```
-
-**Demo: `@` context reference:**
-Type `@` in the chat — CoCo shows catalog objects (tables, schemas, views) and workspace files. Pick `GSK_GCC_HOL.HOL_2.COMPOUNDS` to auto-inject schema + sample rows.
 
 **Demo: CoCo SQL generation:**
 ```
@@ -36,18 +44,21 @@ Are there any compounds with severe adverse events? Show me the worst offenders.
 
 **Prompt 1 — Generate PATIENT_DEMOGRAPHICS:**
 ```
-Look at the tables in GSK_GCC_HOL.HOL_2. I need a PATIENT_DEMOGRAPHICS table with 200 rows that links to the CLINICAL_TRIALS table via trial_id. Include patient_id, age, sex, ethnicity, bmi, smoker_status, comorbidities, and enrollment_date.
+Look at the tables in GSK_GCC_HOL.HOL_2. I need a PATIENT_DEMOGRAPHICS table with 200 rows that links to the CLINICAL_TRIALS table via trial_id. Create it in HOL_2_WORK.HOL_2. Include patient_id, age, sex, ethnicity, bmi, smoker_status, comorbidities, and enrollment_date.
 ```
 
 **Prompt 2 — Verify the data:**
 ```
-Show me a summary — row counts for all tables in HOL_2 and a sample of the new PATIENT_DEMOGRAPHICS table.
+Show me a summary — row counts for all tables in GSK_GCC_HOL.HOL_2 and HOL_2_WORK.HOL_2, and a sample of the new PATIENT_DEMOGRAPHICS table.
 ```
 
 **Prompt 3 — Explore the new data:**
 ```
 What's the age and sex distribution of patients across our clinical trials?
 ```
+
+**Demo: `@` context reference:**
+Type `@` in the chat — pick `HOL_2_WORK.HOL_2.PATIENT_DEMOGRAPHICS` to auto-inject schema + sample rows. This shows CoCo can reference any table you have access to.
 
 **Fallback:** If CoCo struggles, paste `patient_demographics.sql` from the fallbacks folder.
 
@@ -65,7 +76,7 @@ What's the age and sex distribution of patients across our clinical trials?
 ```
 Fix this SQL — the database name looks wrong
 ```
-*Fix: `GSK_GCC_HOLLL` → `GSK_GCC_HOL`*
+*Fix: `HOL_2_WORKK` → `HOL_2_WORK`*
 
 **Cell 2 error** (Python — wrong column name in join):
 ```
@@ -94,16 +105,16 @@ Fix this — severity is a string not a number
 
 **Prompt — Build an end-to-end analytics notebook:**
 ```
-Build me a notebook called PHARMA_PIPELINE_REPORT that analyses our pharma pipeline. Use COMPUTE_WH and the tables in GSK_GCC_HOL.HOL_2. Start with a SQL cell to set the warehouse, then a SQL cell joining COMPOUNDS (via COMPOUND_NAME = PRODUCT_NAME), CLINICAL_TRIALS and SALES_DATA to summarise by therapeutic area — compound count, trial count, approval rate and total revenue. Then a Python cell to enrich the data with revenue per compound and flag high-confidence areas (>80% approval). Finally a Python cell with an Altair bar chart coloured orange for high confidence and grey for the rest — make sure to enable the mimetype renderer.
+Build me a notebook called PHARMA_PIPELINE_REPORT that analyses our pharma pipeline. Set the session database to HOL_2_WORK and use COMPUTE_WH, but read from the tables in GSK_GCC_HOL.HOL_2. Start with a SQL cell to set the warehouse and database, then a SQL cell joining COMPOUNDS (via COMPOUND_NAME = PRODUCT_NAME), CLINICAL_TRIALS and SALES_DATA to summarise by therapeutic area — compound count, trial count, approval rate and total revenue. Then a Python cell to enrich the data with revenue per compound and flag high-confidence areas (>80% approval). Finally a Python cell with an Altair bar chart coloured orange for high confidence and grey for the rest — make sure to enable the mimetype renderer.
 ```
 
-**What to check:** Warehouse set first, SQL joins on correct keys, Python adds computed columns, Altair chart renders with mimetype renderer.
+**What to check:** Session DB is HOL_2_WORK (not GSK_GCC_HOL), warehouse set first, SQL joins on correct keys using FQN against GSK_GCC_HOL.HOL_2, Altair chart renders with mimetype renderer.
 
 
 
 **Prompt — Generate AGENTS.md:**
 ```
-Create an AGENTS.md file for this workspace. The agent should act as a GSK pharmaceutical data analyst, always use GSK_GCC_HOL.HOL_2, give clear non-technical explanations for business stakeholders, add comments to all SQL, and prefer charts over raw tables. Important: the agent must start every response with "🧪 GSK MODE ACTIVATED —" so we can see it's working.
+Create an AGENTS.md file for this workspace. The agent should act as a GSK pharmaceutical data analyst, read source data from GSK_GCC_HOL.HOL_2 and create any new objects in HOL_2_WORK.HOL_2. Give clear non-technical explanations for business stakeholders, add comments to all SQL, and prefer charts over raw tables. Important: the agent must start every response with "🧪 GSK MODE ACTIVATED —" so we can see it's working.
 ```
 
 **Test prompt (to see changed behaviour):**
@@ -147,11 +158,11 @@ Use the drug-insight-report skill for Dravopimab
 
 **Prompt — Invoke the Streamlit skill to build a branded dashboard:**
 ```
-/streamlit-dashboard Create a GSK pharma pipeline dashboard using GSK_GCC_HOL.HOL_2. Include compound pipeline overview, trial success rates, adverse event breakdown, and revenue by region.
+/streamlit-dashboard Create a GSK pharma pipeline dashboard reading from GSK_GCC_HOL.HOL_2. Include compound pipeline overview, trial success rates, adverse event breakdown, and revenue by region.
 ```
 > The `/streamlit-dashboard` prefix invokes the pre-installed skill that ensures correct SiS patterns + GSK branding.
 
-**What to check in generated code:** GSK logo, orange metrics (#F36F21), navy headings (#00205C), `get_active_session()` (NOT `st.connection`), fully qualified table names, `.to_pandas()` before charts.
+**What to check in generated code:** GSK logo, orange metrics (#F36F21), navy headings (#00205C), `get_active_session()` (NOT `st.connection`), fully qualified table names against GSK_GCC_HOL.HOL_2, `.to_pandas()` before charts.
 
 **Talking point:** "One prompt, branded dashboard. The skill handles connection patterns, layout, AND your company branding. Define standards once, every dashboard follows them."
 

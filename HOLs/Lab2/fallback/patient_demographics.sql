@@ -1,4 +1,4 @@
-USE DATABASE GSK_GCC_HOL;
+USE DATABASE HOL_2_WORK;
 USE SCHEMA HOL_2;
 USE WAREHOUSE COMPUTE_WH;
 
@@ -7,7 +7,7 @@ WITH trial_pool AS (
     SELECT trial_id, start_date,
         COALESCE(end_date, '2025-12-31'::DATE) AS eff_end,
         DATEDIFF('day', start_date, COALESCE(end_date, '2025-12-31'::DATE)) AS day_range
-    FROM CLINICAL_TRIALS
+    FROM GSK_GCC_HOL.HOL_2.CLINICAL_TRIALS
 ),
 generated AS (
     SELECT

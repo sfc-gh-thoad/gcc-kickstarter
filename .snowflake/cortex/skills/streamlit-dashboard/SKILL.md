@@ -434,7 +434,7 @@ Follow these steps IN ORDER:
 1. **Write the .py file** to the workspace (you already do this).
 2. **Create a stage** (if it doesn't already exist):
    ```sql
-   CREATE STAGE IF NOT EXISTS GSK_GCC_HOL.HOL_2.STREAMLIT_STAGE
+   CREATE STAGE IF NOT EXISTS HOL_2_WORK.HOL_2.STREAMLIT_STAGE
        DIRECTORY = (ENABLE = TRUE)
        ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
    ```
@@ -452,7 +452,7 @@ Follow these steps IN ORDER:
        code = '''<PASTE THE ENTIRE .py FILE CONTENT HERE>'''
        session.file.put_stream(
            io.BytesIO(code.encode('utf-8')),
-           '@GSK_GCC_HOL.HOL_2.STREAMLIT_STAGE/dashboard.py',
+           '@HOL_2_WORK.HOL_2.STREAMLIT_STAGE/dashboard.py',
            auto_compress=False, overwrite=True
        )
        return 'uploaded'
@@ -462,8 +462,8 @@ Follow these steps IN ORDER:
    Replace `<PASTE THE ENTIRE .py FILE CONTENT HERE>` with the actual dashboard code. Use triple-quoted strings (`'''...'''`) and escape any internal triple-quotes.
 4. **Create the Streamlit app object:**
    ```sql
-   CREATE OR REPLACE STREAMLIT GSK_GCC_HOL.HOL_2.GSK_DASHBOARD
-       ROOT_LOCATION = '@GSK_GCC_HOL.HOL_2.STREAMLIT_STAGE'
+   CREATE OR REPLACE STREAMLIT HOL_2_WORK.HOL_2.GSK_DASHBOARD
+       ROOT_LOCATION = '@HOL_2_WORK.HOL_2.STREAMLIT_STAGE'
        MAIN_FILE = 'dashboard.py'
        QUERY_WAREHOUSE = 'COMPUTE_WH';
    ```
