@@ -74,17 +74,13 @@ def gsk_bar(df, x, y, x_title=None, y_title=None, height=300, horizontal=False, 
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    with st.container(border=True):
-        st.metric("Compounds", f"{len(compounds):,}")
+    st.metric("Compounds", f"{len(compounds):,}")
 with col2:
-    with st.container(border=True):
-        st.metric("Clinical Trials", f"{len(trials):,}")
+    st.metric("Clinical Trials", f"{len(trials):,}")
 with col3:
-    with st.container(border=True):
-        st.metric("Adverse Events", f"{len(adverse):,}")
+    st.metric("Adverse Events", f"{len(adverse):,}")
 with col4:
-    with st.container(border=True):
-        st.metric("Approved Drugs", f"{len(compounds[compounds['PHASE'] == 'Approved']):,}")
+    st.metric("Approved Drugs", f"{len(compounds[compounds['PHASE'] == 'Approved']):,}")
 
 left, right = st.columns(2)
 
@@ -137,10 +133,10 @@ c3.write(f"**Target:** {comp_row['TARGET_PROTEIN']}")
 comp_trials = trials[trials["COMPOUND_ID"] == comp_row["COMPOUND_ID"]]
 if len(comp_trials) > 0:
     st.write("**Clinical Trials:**")
-    st.dataframe(comp_trials[["TRIAL_ID", "TRIAL_PHASE", "STATUS", "SITE_COUNTRY", "ENROLLED_PATIENTS", "SUCCESS"]], use_container_width=True, hide_index=True)
+    st.dataframe(comp_trials[["TRIAL_ID", "TRIAL_PHASE", "STATUS", "SITE_COUNTRY", "ENROLLED_PATIENTS", "SUCCESS"]], use_container_width=True)
 
     trial_ids = comp_trials["TRIAL_ID"].tolist()
     comp_ae = adverse[adverse["TRIAL_ID"].isin(trial_ids)]
     if len(comp_ae) > 0:
         st.write(f"**Adverse Events:** {len(comp_ae)} total")
-        st.dataframe(comp_ae[["EVENT_TYPE", "SEVERITY", "OUTCOME", "RELATIONSHIP_TO_DRUG"]], use_container_width=True, hide_index=True)
+        st.dataframe(comp_ae[["EVENT_TYPE", "SEVERITY", "OUTCOME", "RELATIONSHIP_TO_DRUG"]], use_container_width=True)

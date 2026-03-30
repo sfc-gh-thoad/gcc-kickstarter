@@ -44,7 +44,7 @@ Are there any compounds with severe adverse events? Show me the worst offenders.
 
 **Prompt 1 — Generate PATIENT_DEMOGRAPHICS:**
 ```
-Look at the tables in HOL_2_WORK.HOL_2. I need a PATIENT_DEMOGRAPHICS table with 200 rows that links to the CLINICAL_TRIALS table via trial_id. Create it in HOL_2_WORK.HOL_2. Include patient_id, age, sex, ethnicity, bmi, smoker_status, comorbidities, and enrollment_date.
+Create a table called PATIENT_DEMOGRAPHICS in HOL_2_WORK.HOL_2 with 200 rows of realistic patient data. Columns: patient_id, trial_id, age, sex, ethnicity, bmi, smoker_status, comorbidities, enrollment_date. Use INSERT statements with hardcoded values — don't use GENERATOR or RANDOM functions. Link each row to a valid trial_id from HOL_2_WORK.HOL_2.CLINICAL_TRIALS.
 ```
 
 **Prompt 2 — Verify the data:**
@@ -56,9 +56,6 @@ Show me a summary — row counts for all tables in HOL_2_WORK.HOL_2 and a sample
 ```
 What's the age and sex distribution of patients across our clinical trials?
 ```
-
-**Demo: `@` context reference:**
-Type `@` in the chat — pick `HOL_2_WORK.HOL_2.PATIENT_DEMOGRAPHICS` to auto-inject schema + sample rows. This shows CoCo can reference any table you have access to.
 
 **Fallback:** If CoCo struggles, paste `patient_demographics.sql` from the fallbacks folder.
 
@@ -158,7 +155,7 @@ Use the drug-insight-report skill for Dravopimab
 
 **Prompt — Invoke the Streamlit skill to build a branded dashboard:**
 ```
-/streamlit-dashboard Create a GSK pharma pipeline dashboard reading from HOL_2_WORK.HOL_2. Include compound pipeline overview, trial success rates, adverse event breakdown, and revenue by region.
+/streamlit-dashboard Create a GSK pharma pipeline dashboard reading from HOL_2_WORK.HOL_2. Include compound pipeline overview, trial success rates, adverse event breakdown, and revenue by region. Just write the code, don't deploy it.
 ```
 > The `/streamlit-dashboard` prefix invokes the pre-installed skill that ensures correct SiS patterns + GSK branding.
 

@@ -174,7 +174,7 @@ st.markdown('<div style="font-size:2.5rem;font-weight:700;color:#F36F21;letter-s
 
 Charts MUST use a **gradient colour scale** — bars are coloured from light peach to dark maroon based on their value. This looks professional and polished. A colour legend is shown on the right.
 
-Do NOT wrap charts in `st.container(border=True)` — charts should sit directly on the white page background with just a `st.subheader()` above them.
+Do NOT use `st.container(border=True)` anywhere — it is not supported in the SiS Streamlit version. Charts sit directly on the white page background with just a `st.subheader()` above them.
 
 Define this helper function ONCE near the top of every dashboard (after imports and session setup):
 
@@ -208,7 +208,7 @@ def gsk_line(df, x, y, x_title=None, y_title=None, height=300):
     ).configure_view(strokeWidth=0), use_container_width=True)
 ```
 
-Then use them like this — note NO `st.container(border=True)` wrapper:
+Then use them like this:
 ```python
 left, right = st.columns(2)
 with left:
@@ -222,7 +222,7 @@ with right:
 **Chart rules:**
 - ALWAYS use `gsk_bar()` or `gsk_line()` — never raw `st.bar_chart` or `st.line_chart`
 - ALWAYS use gradient colour scale (`GSK_GRADIENT`) — never flat single-colour bars
-- Do NOT wrap charts in `st.container(border=True)` — let them sit on white background
+- Do NOT use `st.container(border=True)` anywhere — not supported in SiS
 - NEVER use donut/pie charts, stacked bars, or multi-axis charts
 - Use `horizontal=True` for category charts with long labels (e.g. therapeutic areas, countries)
 - Use `sort="-y"` (descending by value) or `sort="-x"` for horizontal charts
@@ -233,24 +233,20 @@ with right:
 
 ## RULE 8: Layout Patterns
 
-### KPI Row (wrap each metric in a bordered container)
+### KPI Row
 ```python
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    with st.container(border=True):
-        st.metric("Compounds", f"{len(compounds):,}")
+    st.metric("Compounds", f"{len(compounds):,}")
 with col2:
-    with st.container(border=True):
-        st.metric("Trials", f"{len(trials):,}")
+    st.metric("Trials", f"{len(trials):,}")
 with col3:
-    with st.container(border=True):
-        st.metric("Adverse Events", f"{len(adverse):,}")
+    st.metric("Adverse Events", f"{len(adverse):,}")
 with col4:
-    with st.container(border=True):
-        st.metric("Approved", f"{approved_count:,}")
+    st.metric("Approved", f"{approved_count:,}")
 ```
 
-NEVER use `st.metric(..., border=True)` — this parameter does NOT exist in the SiS Streamlit version.
+NEVER use `st.metric(..., border=True)` or `st.container(border=True)` — neither is supported in the SiS Streamlit version.
 
 ### Two-Column Charts (NO border wrapper — charts sit on white background)
 ```python
@@ -273,7 +269,7 @@ with st.sidebar:
 
 ### Data Tables
 ```python
-st.dataframe(df, use_container_width=True, hide_index=True)
+st.dataframe(df, use_container_width=True)
 ```
 
 ---
@@ -309,25 +305,27 @@ if __name__ == "__main__":
 The SiS warehouse runtime runs an OLDER Streamlit version. Many newer Streamlit APIs do NOT work.
 
 **DO NOT USE these — they will crash the app:**
-- `st.metric(..., border=True)` — use `st.container(border=True)` wrapper instead
+- `st.metric(..., border=True)` — not available; use plain `st.metric()` in columns
 - `st.metric(..., chart_data=...)` — sparklines not available
 - `st.logo()` — not available
 - `st.badge()` — not available
 - `st.space()` — not available
 - `st.pills()` — not available
 - `st.segmented_control()` — not available
+- `st.container(border=True)` — not available
 - `st.container(horizontal=True)` — not available
+- `st.dataframe(hide_index=True)` — not available; omit `hide_index`
 - `st.image()` with external URLs — often fails due to network restrictions
 
 **SAFE to use (confirmed working in SiS):**
-- `st.container(border=True)` — for bordered cards
+- `st.container()` — for grouping (do NOT pass `border=True` — not supported)
 - `st.columns()` — for layout
 - `st.metric()` — without border param
 - `st.bar_chart()`, `st.line_chart()`, `st.area_chart()` — native charts
 - `st.altair_chart()` — Altair is pre-installed
 - `st.selectbox()`, `st.multiselect()`, `st.slider()` — standard widgets
 - `st.markdown(..., unsafe_allow_html=True)` — for CSS and HTML branding
-- `st.dataframe(hide_index=True)` — with column_config
+- `st.dataframe()` — with `use_container_width=True` (do NOT pass `hide_index` — not supported)
 
 ---
 
@@ -377,7 +375,6 @@ st.dataframe(
         "INTERNAL_ID": None,  # hides column from display
     },
     use_container_width=True,
-    hide_index=True,
 )
 ```
 
@@ -417,60 +414,20 @@ rate = df["SUCCESSES"] / df["TOTAL"] * 100  # TypeError!
 | Page title/icon not showing | SiS limitation | Only `layout` param works in `st.set_page_config` |
 | `if __name__ == "__main__":` | Wrong code structure | Remove it — Streamlit runs the whole file on every interaction |
 | Raw traceback on screen | No error handling | Wrap data loading in `try/except` with `st.error()` + `st.stop()` |
-| `unexpected keyword argument 'border'` on metric | `st.metric(border=True)` not in SiS version | Wrap metric in `st.container(border=True)` instead |
+| `unexpected keyword argument 'border'` on metric | `st.metric(border=True)` not in SiS version | Use plain `st.metric()` — do NOT wrap in `st.container(border=True)` either (also unsupported) |
+| `unexpected keyword argument 'hide_index'` | `st.dataframe(hide_index=True)` not in SiS version | Remove `hide_index=True` from `st.dataframe()` |
 | Broken image / `:0` | `st.image()` with external URL fails in SiS | Use inline HTML: `st.markdown('<div style="...">GSK</div>', unsafe_allow_html=True)` |
 | `Expected numeric dtype, got object` | Snowflake NUMBER → Python Decimal → pandas object | Cast first: `pd.to_numeric(df["COL"])` or `.astype(float)` |
 
 ---
 
-## RULE 15: Auto-Deployment (CRITICAL — always deploy after writing)
+## RULE 15: Write Only — Do NOT Deploy
 
-After writing the .py file, you MUST deploy it as a Streamlit in Snowflake app. Do NOT tell the user to deploy manually.
+**Just write the .py file to the workspace.** Do NOT deploy it to Snowflake. Do NOT create stages, stored procedures, or Streamlit objects. Do NOT run any SQL.
 
-**IMPORTANT: `PUT` does NOT work from Snowsight SQL worksheets.** Use an anonymous stored procedure to upload the file content to a stage, then create the Streamlit object.
+After writing the file, tell the user: "Dashboard code written to `<filename>`. To deploy, create a Streamlit app in Snowsight and paste the code."
 
-Follow these steps IN ORDER:
-
-1. **Write the .py file** to the workspace (you already do this).
-2. **Create a stage** (if it doesn't already exist):
-   ```sql
-   CREATE STAGE IF NOT EXISTS HOL_2_WORK.HOL_2.STREAMLIT_STAGE
-       DIRECTORY = (ENABLE = TRUE)
-       ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
-   ```
-3. **Upload the file content** using an anonymous Python stored procedure (this works in Snowsight):
-   ```sql
-   WITH upload_dashboard AS PROCEDURE()
-       RETURNS STRING
-       LANGUAGE PYTHON
-       RUNTIME_VERSION = '3.9'
-       PACKAGES = ('snowflake-snowpark-python')
-       HANDLER = 'run'
-   AS $$
-   def run(session):
-       import io
-       code = '''<PASTE THE ENTIRE .py FILE CONTENT HERE>'''
-       session.file.put_stream(
-           io.BytesIO(code.encode('utf-8')),
-           '@HOL_2_WORK.HOL_2.STREAMLIT_STAGE/dashboard.py',
-           auto_compress=False, overwrite=True
-       )
-       return 'uploaded'
-   $$
-   CALL upload_dashboard();
-   ```
-   Replace `<PASTE THE ENTIRE .py FILE CONTENT HERE>` with the actual dashboard code. Use triple-quoted strings (`'''...'''`) and escape any internal triple-quotes.
-4. **Create the Streamlit app object:**
-   ```sql
-   CREATE OR REPLACE STREAMLIT HOL_2_WORK.HOL_2.GSK_DASHBOARD
-       ROOT_LOCATION = '@HOL_2_WORK.HOL_2.STREAMLIT_STAGE'
-       MAIN_FILE = 'dashboard.py'
-       QUERY_WAREHOUSE = 'COMPUTE_WH';
-   ```
-5. **Tell the user** the app is deployed and they can open it in Snowsight.
-
-Adjust database, schema, stage name, app name, file name, and warehouse to match the user's context.
-If the user's warehouse or database is unknown, ask — but always deploy.
+This keeps generation fast — deployment is a separate manual step.
 
 ---
 
@@ -547,17 +504,13 @@ for _df in [compounds, trials]:
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    with st.container(border=True):
-        st.metric("Compounds", f"{len(compounds):,}")
+    st.metric("Compounds", f"{len(compounds):,}")
 with col2:
-    with st.container(border=True):
-        st.metric("Trials", f"{len(trials):,}")
+    st.metric("Trials", f"{len(trials):,}")
 with col3:
-    with st.container(border=True):
-        st.metric("Metric 3", f"{value3:,}")
+    st.metric("Metric 3", f"{value3:,}")
 with col4:
-    with st.container(border=True):
-        st.metric("Metric 4", f"{value4:,}")
+    st.metric("Metric 4", f"{value4:,}")
 
 left, right = st.columns(2)
 with left:
@@ -574,6 +527,5 @@ st.dataframe(
         "REVENUE_USD": st.column_config.NumberColumn("Revenue", format="$%.2f"),
     },
     use_container_width=True,
-    hide_index=True,
 )
 ```
